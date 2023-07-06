@@ -3,11 +3,12 @@
 {% block content %}
 
 <form action="" method="post">
+    {# Added to Django template for POST to submit data to reduce the chance of forms being hijacked #}
     {% csrf_token %}
     <table>
     {{ form.as_table }}
     </table>
     <input type="submit" value="Submit">
-    
+
 </form>
 {% endblock %}

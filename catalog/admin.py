@@ -1,70 +1,61 @@
+'''
+This file defines the admin page that can be visited at domain:port/admin.
+The admin page is useful to add, delete, or modify data defined in your ./models.py file
+'''
+
+
 from django.contrib import admin
-
-# Register your models here.
-
 from .models import Author, Genre, Book, BookInstance, Language
 
-"""Minimal registration of Models.
-admin.site.register(Book)
-admin.site.register(Author)
-admin.site.register(BookInstance)
-admin.site.register(Genre)
-admin.site.register(Language)
-"""
 
+# One way to register models defined in ./models.py.
+# In order to register a model, you need to provide the model and the rendering template.
+# This is sufficient for simple models like Genre and Language, which only has a string field.
+# By default, this way uses admin.ModelAdmin
 admin.site.register(Genre)
 admin.site.register(Language)
 
 
+# This class crates a type of inline model, which is used by another model (i.e AuthorAdmin)
 class BooksInline(admin.TabularInline):
-    """Defines format of inline book insertion (used in AuthorAdmin)"""
     model = Book
 
 
-@admin.register(Author)
-class AuthorAdmin(admin.ModelAdmin):
-    """Administration object for Author models.
-    Defines:
-     - fields to be displayed in list view (list_display)
-     - orders fields in detail view (fields),
-       grouping the date fields horizontally
-     - adds inline addition of books in author view (inlines)
-    """
-    list_display = ('last_name',
-                    'first_name', 'date_of_birth', 'date_of_death')
-    fields = ['first_name', 'last_name', ('date_of_birth', 'date_of_death')]
-    inlines = [BooksInline]
-
-
+# This class crates a type of inline model, which is used by another model (i.e BookAdmin)
 class BooksInstanceInline(admin.TabularInline):
-    """Defines format of inline book instance insertion (used in BookAdmin)"""
     model = BookInstance
 
 
+# Registers AuthorAdmin with Author model
+@admin.register(Author)
+class AuthorAdmin(admin.ModelAdmin):
+    # Fields you see when you are viewing an author record. These strings are columns in the Author model/db table.
+    list_display = ('last_name', 'first_name', 'date_of_birth', 'date_of_death')
+    # Fields you see when you are creating a new record or modifying a record
+    fields = ['first_name', 'last_name', ('date_of_birth', 'date_of_death')]
+    # Inlines allows you to register another model under Author
+    inlines = [BooksInline]
+
+
 class BookAdmin(admin.ModelAdmin):
-    """Administration object for Book models.
-    Defines:
-     - fields to be displayed in list view (list_display)
-     - adds inline addition of book instances in book view (inlines)
-    """
     list_display = ('title', 'author', 'display_genre')
     inlines = [BooksInstanceInline]
 
 
+# Manually register the BookAdmin with Book model
 admin.site.register(Book, BookAdmin)
 
 
 @admin.register(BookInstance)
 class BookInstanceAdmin(admin.ModelAdmin):
-    """Administration object for BookInstance models.
-    Defines:
-     - fields to be displayed in list view (list_display)
-     - filters that will be displayed in sidebar (list_filter)
-     - grouping of fields into sections (fieldsets)
-    """
     list_display = ('book', 'status', 'borrower', 'due_back', 'id')
+    # When you visit host:port/admin/catalog/bookinstance/, you get a navigation pane on the right
+    # where you can filter based on these db columns. Note that "status" is a dropdown choice
+    # and "due_back" is a date, both of which have default filter options.
     list_filter = ('status', 'due_back')
 
+    # This organizes a group of fields; the first one has None heading and fields book, imprint, id.
+    # The second one has "Availability" heading and fields status, due_back, and borrower.
     fieldsets = (
         (None, {
             'fields': ('book', 'imprint', 'id')
