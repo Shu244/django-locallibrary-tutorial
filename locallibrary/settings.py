@@ -161,8 +161,12 @@ LOGIN_REDIRECT_URL = '/'
 # Email structure needs to be configured otherwise.
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+# By default, Django automatically looks for static files in a folder named "static" in each of
+# the installed applications. You can define STATICFILES_DIRS to ask django to look in other folderes for
+# static files
+
 # Static files (CSS, JavaScript, Images) (https://docs.djangoproject.com/en/4.0/howto/static-files/)
-# The absolute path to the directory where collectstatic will collect static files for deployment.
+# The absolute path to the directory where collectstatic will collect and put static files for deployment.
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # The URL to use when referring to static files (where they will be served from)
